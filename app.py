@@ -7,6 +7,7 @@ import spacy.cli
 import string
 spacy.cli.download("pt_core_news_sm")
 import pt_core_news_sm
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 from flask import Flask, request, render_template
 from flask_bootstrap import Bootstrap
@@ -46,6 +47,10 @@ def index():
     return render_template('index.html', form=form, classificacao=classificacao)
 
 def classifica_comentario(comentario):
-    filename = os.path.join('app','model','finalized_model.sav')
-    model = joblib.load(filename)
+    limpa_cmentario(comentario)
+    modelfile = os.path.join('app','model','finalized_model.sav')
+    vetorizadorfile = os.path.join('app', 'model', 'vetorizador.joblib')
+    model = joblib.load(modelname)
+    vetorizador = joblib.load(vetorizadorfile)
+    vetorizador.transform([comentario])
     return model.predict(x)[0]
