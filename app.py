@@ -7,7 +7,13 @@ import spacy.cli
 import string
 spacy.cli.download("pt_core_news_sm")
 import pt_core_news_sm
+import sklearn
 from sklearn.feature_extraction.text import TfidfVectorizer
+spacy_pt = pt_core_news_sm.load()
+nltk.download('stopwords')
+stopwords = nltk.corpus.stopwords.words("portuguese")
+stopwords.remove('não')
+stopwords.remove('nem')
 
 from flask import Flask, request, render_template
 from flask_bootstrap import Bootstrap
@@ -23,13 +29,7 @@ bootstrap = Bootstrap(app)
 class InputForm(FlaskForm):
     comment = TextField('Comentário: ', validators=[DataRequired()])
 
-
 def limpa_cmentario(comentario):
-    spacy_pt = pt_core_news_sm.load()
-    nltk.download('stopwords')
-    stopwords = nltk.corpus.stopwords.words("portuguese")
-    stopwords.remove('não')
-    stopwords.remove('nem')
     comentario = re.sub(r'\s+',' ',comentario)
     comentario = comentario.lower()
     comentario = [word for word in comentario.split() if word not in stopwords and word not in string.punctuation]
@@ -42,15 +42,15 @@ def index():
     form = InputForm(request.form)
     classificacao = ""
     if form.validate_on_submit():
-        comentario = form.comment
+        comentario = form.comment.data
         classificacao = classifica_comentario(comentario)
     return render_template('index.html', form=form, classificacao=classificacao)
 
 def classifica_comentario(comentario):
-    limpa_cmentario(comentario)
     modelfile = os.path.join('app','model','finalized_model.sav')
     vetorizadorfile = os.path.join('app', 'model', 'vetorizador.joblib')
     model = joblib.load(modelname)
     vetorizador = joblib.load(vetorizadorfile)
-    vetorizador.transform([comentario])
+    comentario = limpa_cmentario(comentario)
+    comentario = vetorizador.transform([comentario])
     return model.predict(x)[0]
