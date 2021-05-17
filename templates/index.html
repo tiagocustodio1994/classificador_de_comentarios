@@ -1,0 +1,30 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Sommelier Inteligente{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1 class="text-center">Classificador de Ceomentários</h1>
+    </div>
+    <div class="page-body">
+        <form action="/" method="POST" class="form">
+            {{ form.csrf_token }}
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="row">
+                        <div class="form-group">
+                            {{ wtf.form_field(form.comment, class='form-control') }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-9">
+                            <button type="submit" class="btn btn-primary">Classificar Comentario</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
